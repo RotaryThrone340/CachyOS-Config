@@ -1,0 +1,4 @@
+#!/bin/sh
+google-chrome-stable --app=https://claude.ai &
+sleep 0.1
+hyprctl dispatch 'hl.dsp.window.move({ monitor = "HDMI-A-1", follow = false })'

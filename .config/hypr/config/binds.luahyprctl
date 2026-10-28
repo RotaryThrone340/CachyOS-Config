@@ -1,0 +1,1 @@
+hl.bind(mainMod .. " + M", hl.dsp.window.move({ workspace = "special:music", follow = false })) reload

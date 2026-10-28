@@ -1,0 +1,5 @@
+#!/bin/sh
+(sleep 3
+pactl unload-module module-loopback 2>/dev/null
+pactl load-module module-loopback source=sink-sunshine-stereo.monitor sink=alsa_output.usb-yz_EKSA_E1000_WT_000000010000-00.analog-stereo latency_msec=50
+for id in $(pactl list short sink-inputs | cut -f1); do pactl move-sink-input $id sink-sunshine-stereo; done) &

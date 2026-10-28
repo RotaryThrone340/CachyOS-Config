@@ -1,0 +1,6 @@
+#!/bin/sh
+f="$HOME/.config/sunshine/sunshine.conf"
+mkdir -p "$HOME/.config/sunshine"
+touch "$f"
+if grep -q "^output_name" "$f"; then sed -i "s/^output_name.*/output_name = $1/" "$f"; else echo "output_name = $1" >> "$f"; fi
+systemctl --user restart app-dev.lizardbyte.app.Sunshine

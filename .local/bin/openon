@@ -1,0 +1,5 @@
+#!/bin/sh
+mon="$1"; shift
+"$@" &
+sleep "${DELAY:-0.1}"
+hyprctl dispatch "hl.dsp.window.move({ monitor = \"$mon\", follow = false })"

@@ -1,0 +1,2 @@
+#!/bin/sh
+hyprctl dispatch "hl.dsp.exec_cmd('mpv --loop-file=inf \"$1\"', { monitor = 'DP-2' })"

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Super Paper Mario
+Exec=env QT_QPA_PLATFORM=xcb dolphin-emu -b -e "/mnt/games/wii/SUPER PAPER MARIO [R8PE01]/R8PE01.wbfs"
+Icon=/home/dallas/.local/share/icons/spm.png
+Categories=Game;

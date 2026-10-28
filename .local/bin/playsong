@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+import json, sys, urllib.request
+import websocket
+
+PORT = 9222
+term = " ".join(sys.argv[1:])
+if not term:
+    sys.exit("usage: playsong <song name>")
+
+try:
+    pages = json.load(urllib.request.urlopen(f"http://127.0.0.1:{PORT}/json"))
+except Exception:
+    sys.exit("Apple Music window isn't running. Start it with music-left first.")
+
+target = next((p for p in pages if p["type"] == "page" and "music.apple.com" in p["url"]), None)
+if not target:
+    sys.exit("No Apple Music page found.")
+
+JS = """(async()=>{
+const m=MusicKit.getInstance();
+const r=await m.api.music(`/v1/catalog/${m.storefrontId}/search`,{term:%s,types:'songs',limit:1});
+const s=r.data.results.songs.data[0];
+await m.setQueue({song:s.id});
+await m.play();
+return s.attributes.name+' - '+s.attributes.artistName;
+})()""" % json.dumps(term)
+
+ws = websocket.create_connection(target["webSocketDebuggerUrl"])
+ws.send(json.dumps({"id": 1, "method": "Runtime.evaluate",
+    "params": {"expression": JS, "awaitPromise": True, "returnByValue": True, "userGesture": True}}))
+res = json.loads(ws.recv())["result"]
+ws.close()
+print(res["result"].get("value") or res)

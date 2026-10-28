@@ -1,0 +1,4 @@
+#!/bin/sh
+code &
+google-chrome-stable --app=https://claude.ai &
+~/.local/bin/music-left &

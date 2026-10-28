@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+import json, os, subprocess, time, urllib.request
+import websocket
+
+URL = "https://music.apple.com/library/playlist/p.O1kz87VF80VWoQX"
+PROFILE = os.path.expanduser("~/.config/music-chrome")
+PORT = 9222
+
+JS = """
+const wait=(s,ms=30000)=>new Promise((r,j)=>{const t0=Date.now();const t=setInterval(()=>{const e=document.querySelector(s);if(e){clearInterval(t);r(e)}else if(Date.now()-t0>ms){clearInterval(t);j(s)}},200)});
+(async()=>{(await wait('button[aria-label*="huffle"]')).click();(await wait('[aria-label="Open Full Screen Player"]')).click()})()
+"""
+
+subprocess.Popen([
+    "google-chrome-stable", f"--app={URL}", f"--user-data-dir={PROFILE}",
+    f"--remote-debugging-port={PORT}", f"--remote-allow-origins=http://127.0.0.1:{PORT}",
+    "--autoplay-policy=no-user-gesture-required",
+], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+target = None
+for _ in range(100):
+    try:
+        pages = json.load(urllib.request.urlopen(f"http://127.0.0.1:{PORT}/json"))
+        target = next((p for p in pages if p["type"] == "page" and "music.apple.com" in p["url"]), None)
+        if target:
+            break
+    except Exception:
+        pass
+    time.sleep(0.3)
+
+if target:
+    time.sleep(0.5)
+    ws = websocket.create_connection(target["webSocketDebuggerUrl"])
+    ws.send(json.dumps({"id": 1, "method": "Runtime.evaluate",
+        "params": {"expression": JS, "awaitPromise": True, "userGesture": True}}))
+    print(ws.recv())
+    ws.close()
